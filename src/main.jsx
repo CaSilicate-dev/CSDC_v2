@@ -8,7 +8,10 @@ import App from './App.jsx'
 createRoot(document.getElementById('root')).render(
   <ConfigProvider
     theme={{
-      algorithm: theme.darkAlgorithm
+      algorithm: theme.darkAlgorithm,
+      token: {
+        borderRadius: 0,
+      }
     }}
   >
     <StrictMode>

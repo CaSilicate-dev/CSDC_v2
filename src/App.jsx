@@ -69,11 +69,11 @@ function App() {
 
   return (
     <>
-      <Drawer title="Settings" onClose={closeDrawer} open={open}>
+      <Drawer title="Settings" onClose={closeDrawer} open={open} size={"large"}>
 
         <Divider>时间设置</Divider>
 
-        <Row align="middle">
+        <Row align="middle" gutter={[16, 8]}>
           <Col span={12}>
             <Text>目标时间</Text>
           </Col>
@@ -128,10 +128,10 @@ function App() {
         <Divider>数值设置</Divider>
 
         <Row align="middle" gutter={[16, 8]}>
-          <Col span={8}>
+          <Col span={12}>
             <Text>显示单位</Text>
           </Col>
-          <Col span={16}>
+          <Col span={12}>
             <Radio.Group value={displayType} onChange={(value) => {setDisplayType(value.target.value)}} >
               <Radio.Button value={0}>毫秒</Radio.Button>
               <Radio.Button value={1}>秒</Radio.Button>
@@ -161,10 +161,10 @@ function App() {
             </Space>
           </Col>
 
-          <Col span={6}>
+          <Col span={12}>
             <Text>显示方式</Text>
           </Col>
-          <Col span={18}>
+          <Col span={12}>
             <Radio.Group value={displayMethod} onChange={(value) => {setDisplayMethod(value.target.value)}}>
               <Radio.Button value={0}>两端</Radio.Button>
               <Radio.Button value={1}>平均</Radio.Button>

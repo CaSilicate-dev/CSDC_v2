@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 
-import { Card, Button, Flex, Drawer, TimePicker, Typography, Row, Col, Divider, InputNumber, Radio, Space, Input } from 'antd'
+import { Card, Button, Flex, Drawer, TimePicker, Typography, Row, Col, Divider, InputNumber, Radio, Space, Input, DatePicker, Switch } from 'antd'
 import dayjs from 'dayjs'
 
 import "./App.css";
 
 const { Text } = Typography
 
-function App() {
+function App({ dark, setDark }) {
 
   const [open, setOpen] = useState(false);
 
@@ -23,6 +23,9 @@ function App() {
   const [refreshFreq, setRefreshFreq] = useState(30);
   const [offset, setOffset] = useState(108);
   const [displayMethod, setDisplayMethod] = useState(0);
+  const [displayMS, setDisplayMS] = useState(true);
+  const [displayTitle2, setDisplayTitle2] = useState(false);
+
 
   function openDrawer(){
     setOpen(true)
@@ -31,13 +34,60 @@ function App() {
     setOpen(false)
   }
   function handleTimeChange(value) {
-    console.log(value)
     setTime(value)
+  }
+
+  function formatMilliseconds(ms) { // AI generated function 
+    const units = [
+      { name: '世纪', ms: 36500 * 86400000 },
+      { name: '年', ms: 365 * 86400000 },
+      { name: '月', ms: 30 * 86400000 },
+      { name: '日', ms: 86400000 },
+      { name: '小时', ms: 3600000 },
+      { name: '分钟', ms: 60000 },
+      { name: '秒', ms: 1000 },
+      { name: '毫秒', ms: 1 }
+    ];
+
+    if (ms === 0) return '';
+
+    let remaining = Math.abs(ms);
+
+    const parts = [];
+
+    if (ms < 0) {
+      parts.push("-")
+    }
+
+    for (const unit of units) {
+
+      if (unit.name === '毫秒' && displayMS === false) {
+        continue
+      }
+
+      const count = Math.floor(remaining / unit.ms);
+      if (count > 0) {
+        let formattedCount;
+        if (unit.name === '秒') {
+          formattedCount = count.toString().padStart(2, '0');
+        } else if (unit.name === '毫秒') {
+          formattedCount = count.toString().padStart(3, '0');
+        } else {
+          formattedCount = count.toString();
+        }
+        parts.push(formattedCount + " " + unit.name);
+        remaining %= unit.ms;
+      }
+    }
+
+    const result = parts.join(' ');
+    
+    return result;
   }
 
   function TypeDisplay(type, delta) {
     if (type === 0){
-      return (delta).toFixed(digit)
+      return (delta / 1).toFixed(digit)
     }
     if (type === 1){
       return (delta / 1000).toFixed(digit)
@@ -47,6 +97,33 @@ function App() {
     }
     if (type === 3){
       return (delta / 1000 / 60 / 60).toFixed(digit)
+    }
+    if (type === 4){
+      const factor = 1000 * 60 * 60 * 24
+      return (delta / factor).toFixed(digit)
+    }
+    if (type === 5){
+      const factor = 1000 * 60 * 60 * 24 * 7
+      return (delta / factor).toFixed(digit)
+    }
+    if (type === 6){
+      const factor = 1000 * 60 * 60 * 24 * 30
+      return (delta / factor).toFixed(digit)
+    }
+    if (type === 7){
+      const factor = 1000 * 60 * 60 * 24 * 90
+      return (delta / factor).toFixed(digit)
+    }
+    if (type === 8){
+      const factor = 1000 * 60 * 60 * 24 * 365
+      return (delta / factor).toFixed(digit)
+    }
+    if (type === 9){
+      const factor = 1000 * 60 * 60 * 24 * 365 * 100
+      return (delta / factor).toFixed(digit)
+    }
+    if (type === 10){
+      return formatMilliseconds(delta)
     }
   }
 
@@ -65,20 +142,20 @@ function App() {
 
     return () => clearInterval(interval)
   }
-  useEffect(mainCountdown, [time, displayType, digit, refreshFreq])
+  useEffect(mainCountdown, [time, displayType, digit, refreshFreq, displayMS])
 
   return (
     <>
-      <Drawer title="Settings" onClose={closeDrawer} open={open} size={"large"}>
+      <Drawer title="设置" onClose={closeDrawer} open={open} size={"large"}>
 
         <Divider>时间设置</Divider>
 
         <Row align="middle" gutter={[16, 8]}>
           <Col span={12}>
             <Text>目标时间</Text>
-          </Col>
+          </Col>  
           <Col span={12}>
-            <TimePicker value={time} onChange={handleTimeChange}/>
+            <DatePicker showTime value={time} onChange={(value) => {setTime(value)}}></DatePicker>
           </Col>
         </Row>
         
@@ -132,25 +209,62 @@ function App() {
             <Text>显示单位</Text>
           </Col>
           <Col span={12}>
-            <Radio.Group value={displayType} onChange={(value) => {setDisplayType(value.target.value)}} >
+            <Radio.Group value={displayType} onChange={(value) => {setDisplayType(value.target.value)}}>
+              <Radio.Button value={10}>自动</Radio.Button>
               <Radio.Button value={0}>毫秒</Radio.Button>
               <Radio.Button value={1}>秒</Radio.Button>
               <Radio.Button value={2}>分</Radio.Button>
               <Radio.Button value={3}>时</Radio.Button>
+              <Radio.Button value={4}>天</Radio.Button>
+              <Radio.Button value={5}>周</Radio.Button>
+              <Radio.Button value={6}>月</Radio.Button>
+              <Radio.Button value={7}>季</Radio.Button>
+              <Radio.Button value={8}>年</Radio.Button>
+              <Radio.Button value={9}>世纪</Radio.Button>
             </Radio.Group>
           </Col>
+
+          {(() => {
+            if (displayType === 10) {
+              return (
+                <>
+                  <Col span={12}>
+                    <Text>显示毫秒</Text>
+                  </Col>
+                  <Col span={12}>
+                    <Switch checkedChildren="I" unCheckedChildren="O" value={displayMS} onChange={(value) => {setDisplayMS(value)}}></Switch>
+                  </Col>
+                  <Col span={12}>
+                    <Text>显示标题 2</Text>
+                  </Col>
+                  <Col span={12}>
+                    <Switch checkedChildren="I" unCheckedChildren="O" value={displayTitle2} onChange={(value) => {setDisplayTitle2(value)}}></Switch>
+                  </Col>
+                </>
+              )
+            }
+          })()}
 
           <Col span={12}>
             <Text>小数位数</Text>
           </Col>
           <Col span={12}>
-            <InputNumber min={0} max={6} value={digit} onChange={(value) => {setDigit(value)}} changeOnWheel></InputNumber>
+            <InputNumber min={0} max={12} value={digit} onChange={(value) => {setDigit(value)}} changeOnWheel></InputNumber>
           </Col>
         </Row>
 
         <Divider>显示设置</Divider>
 
         <Row align="middle" gutter={[16, 8]}>
+
+          <Col span={12}>
+            <Text>切换主题</Text>
+          </Col>
+          <Col span={12}>
+            <Button onClick={() => (setDark(!dark))}>{dark ? <Text>暗色主题</Text> : <Text>浅色模式</Text>}</Button>
+          </Col>
+
+          
           <Col span={12}>
             <Text>刷新频率</Text>
           </Col>
@@ -190,7 +304,9 @@ function App() {
               下课放学倒计时
               <Text type="secondary">v2</Text>
             </Space>
-            <Button onClick={openDrawer}>设置</Button>
+            <Space>
+              <Button onClick={openDrawer}>设置</Button>
+            </Space>
           </Flex>
         </>
       } style={{height: "100vh", width: "100vw", borderRadius: 0}}
@@ -203,7 +319,7 @@ function App() {
                 <Flex vertical justify='space-between' align='center' style={{height: "100%"}}>
                   <Text type="secondary" style={{fontSize: font1Size}}>{title1}</Text>
                   <Text strong style={{fontSize: font2Size}}>{content}</Text>
-                  <Text type="secondary" style={{fontSize: font3Size}}>{title2}</Text>
+                  {displayTitle2 ? <></> : <Text type="secondary" style={{fontSize: font3Size}}>{title2}</Text>}
                 </Flex>
               )
             } 
@@ -212,7 +328,7 @@ function App() {
                 <Flex vertical justify='space-evenly' align='center' style={{height: "100%"}}>
                   <Text type="secondary" style={{fontSize: font1Size}}>{title1}</Text>
                   <Text strong style={{fontSize: font2Size}}>{content}</Text>
-                  <Text type="secondary" style={{fontSize: font3Size}}>{title2}</Text>
+                  {displayTitle2 ? <></> : <Text type="secondary" style={{fontSize: font3Size}}>{title2}</Text>}
                 </Flex>
               )
             }
@@ -221,7 +337,7 @@ function App() {
                 <Flex vertical justify='center' align='center' style={{height: "100%"}}>
                   <Text type="secondary" style={{fontSize: font1Size}}>{title1}</Text>
                   <Text strong style={{fontSize: font2Size}}>{content}</Text>
-                  <Text type="secondary" style={{fontSize: font3Size}}>{title2}</Text>
+                  {displayTitle2 ? <></> : <Text type="secondary" style={{fontSize: font3Size}}>{title2}</Text>}
                 </Flex>
               )
             }

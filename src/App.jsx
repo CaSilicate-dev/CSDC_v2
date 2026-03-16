@@ -36,6 +36,38 @@ function App({ dark, setDark }) {
   function handleTimeChange(value) {
     setTime(value)
   }
+  function handleAutoTitle2() {
+    if (displayType === 0) {
+      setTitle2("毫秒")
+    }
+    if (displayType === 1) {
+      setTitle2("秒")
+    }
+    if (displayType === 2) {
+      setTitle2("分钟")
+    }
+    if (displayType === 3) {
+      setTitle2("小时")
+    }
+    if (displayType === 4) {
+      setTitle2("日")
+    }
+    if (displayType === 5) {
+      setTitle2("周")
+    }
+    if (displayType === 6) {
+      setTitle2("月")
+    }
+    if (displayType === 7) {
+      setTitle2("季度")
+    }
+    if (displayType === 8) {
+      setTitle2("年")
+    }
+    if (displayType === 9) {
+      setTitle2("世纪")
+    }
+  }
 
   function formatMilliseconds(ms) { // AI generated function 
     const units = [
@@ -205,6 +237,14 @@ function App({ dark, setDark }) {
         <Divider>数值设置</Divider>
 
         <Row align="middle" gutter={[16, 8]}>
+
+          <Col span={12}>
+            <Text>自动标题</Text>
+          </Col>
+          <Col span={12}>
+            <Button onClick={handleAutoTitle2} style={{width: "100%"}}>将标题 2 设为显示单位</Button>
+          </Col>
+
           <Col span={12}>
             <Text>显示单位</Text>
           </Col>
@@ -244,6 +284,8 @@ function App({ dark, setDark }) {
               )
             }
           })()}
+
+
 
           <Col span={12}>
             <Text>小数位数</Text>
